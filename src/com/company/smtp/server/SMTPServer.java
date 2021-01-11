@@ -1,7 +1,7 @@
 package com.company.smtp.server;
 
+import com.company.smtp.MDA.AccountCleanerThread;
 import com.company.smtp.protocol.CommandHandler;
-import net.jcip.annotations.GuardedBy;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -61,7 +61,7 @@ public class SMTPServer {
 
         System.out.println("SMTP server started");
         this.serverThread = new ServerThread(this, serverSocket);
-        this.accountCleanerThread = new AccountCleanerThread(this);
+        this.accountCleanerThread = new AccountCleanerThread();
         //start of working server
         this.serverThread.start();
 
@@ -103,7 +103,7 @@ public class SMTPServer {
         this.cleaning = value;
     }
 
-    public void stopClening(){
+    public void stopCleaning(){
         if(cleaning == true && accountCleanerThread != null)
             this.accountCleanerThread.shutdown();
     }

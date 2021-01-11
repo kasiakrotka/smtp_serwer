@@ -1,16 +1,16 @@
-package com.company.smtp.server;
+package com.company.smtp.MDA;
 
 import com.company.smtp.MDA.MDA;
+import com.company.smtp.server.SMTPServer;
 
 public class AccountCleanerThread extends Thread {
 
-    private SMTPServer parentServer;
     private MDA mda;
+    private long period = 60000;
     private volatile boolean shutDown = false;
 
-    public AccountCleanerThread(SMTPServer server)
+    public AccountCleanerThread()
     {
-        this.parentServer = server;
         this.mda = new MDA();
     }
 
@@ -26,11 +26,19 @@ public class AccountCleanerThread extends Thread {
         while(!this.shutDown){
             System.out.println("Cleaning outdated accounts");
             mda.clearAccounts();
-            sleep(60000);
+            sleep(period);
         }
     }
 
     public void shutdown() {
         this.shutDown = true;
+    }
+
+    public long getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(long period) {
+        this.period = period;
     }
 }

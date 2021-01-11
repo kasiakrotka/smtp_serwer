@@ -52,7 +52,6 @@ class ServerThread extends Thread{
             }
 
             Socket socket = null;
-
             try {
                 socket = this.serverSocket.accept();
             } catch (IOException e) {
@@ -64,9 +63,7 @@ class ServerThread extends Thread{
                 }
                 continue;
             }
-
             Session session = null;
-
             try {
                 session = new Session(parentServer, this, socket);
             } catch (IOException e) {
@@ -79,7 +76,6 @@ class ServerThread extends Thread{
                 }
                 continue;
             }
-
             synchronized (this) {
                 this.sessionSet.add(session);
             }
@@ -97,7 +93,6 @@ class ServerThread extends Thread{
                     continue;
                 }
             }
-
         }
     }
 

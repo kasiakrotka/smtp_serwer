@@ -54,6 +54,7 @@ public class MessageHandler {
             else
                 parsedLine = inputLine;
             parsedLine = parsedLine.concat("\r\n");
+            System.out.println(parsedLine);
             body.add(parsedLine);
         };
         System.out.println("End of the message");
@@ -63,7 +64,7 @@ public class MessageHandler {
         return state;
     }
 
-    private void sendMessage(Message message){
+    public void sendMessage(Message message){
         String address = message.getRecipient();
         int at = address.indexOf('@');
         if (at == -1)
@@ -78,7 +79,7 @@ public class MessageHandler {
                 sendErrorMessage(message);
         }
         else {
-            relayMessage(message);
+            relayMessage(message, domain);
         }
     }
 
@@ -96,7 +97,7 @@ public class MessageHandler {
         errorMessage.getHeaders().add("Subject: Wiadomość nie została dostarczona\r\n");
         errorMessage.getHeaders().add("Date: "+date+"\r\n");
         errorMessage.getHeaders().add("To: "+message.getRecipient()+"\r\n");
-        errorMessage.getHeaders().add("From: ");
+        errorMessage.getHeaders().add("From: \r\n");
         errorMessage.getHeaders().add("Content-Type: text/html; charset=UTF-8\r\n");
         errorMessage.getBody().add("Wiadomość wysłana na adres: "+message.getRecipient()+" nie została dostarczona\r\n");
         errorMessage.getBody().add("Adres nie istnieje lub wystrąpił wewnętrzny błąd serwera poczty\r\n");
@@ -106,11 +107,11 @@ public class MessageHandler {
         if (domain.equals("ghost.com"))
             sendMessageByMDA(errorMessage);
         else
-            relayMessage(errorMessage);
+            relayMessage(errorMessage, domain);
     }
 
-    private void relayMessage(Message message){
-        SMTPClient smtpClient = new SMTPClient(message);
+    private void relayMessage(Message message, String domain){
+        SMTPClient smtpClient = new SMTPClient(message, domain);
         smtpClient.run();
     }
 }

@@ -328,6 +328,7 @@ public class CommandHandler {
 
             if (messageHandler.handleMessage(parentSession) == MessageHandler.State.RECEIVED) {
                 parentSession.sendResponse(responses.ActionSuccess());
+                messageHandler.sendMessage(parentSession.getMessage());
             } else parentSession.sendResponse(responses.ActionAborted());
         } else
             parentSession.sendResponse(responses.BadSequence());
@@ -354,6 +355,4 @@ public class CommandHandler {
         parentSession.sendResponse(responses.Quit());
         parentSession.quit();
     }
-
-
 }
