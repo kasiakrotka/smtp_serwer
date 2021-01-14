@@ -17,7 +17,6 @@ public class Session implements Runnable{
     private final ServerThread parentServerThread;
     private final SMTPResponses responses;
 
-    private String sessionId;
     private Message message;
 
     //Communication with client
@@ -53,7 +52,6 @@ public class Session implements Runnable{
     }
 
     public void run() {
-        sessionId = "0";
         final String originalName = Thread.currentThread().getName();
         Thread.currentThread().setName(Session.class.getName()+"-"+socket.getInetAddress()+":"+socket.getPort());
         try {
@@ -61,25 +59,16 @@ public class Session implements Runnable{
         }
         catch (IOException e) {
             if(!this.quitting){
-                try{
                     this.sendResponse(responses.ClosingTransmission(this.parentServer.getHostName()));
-                }
-                catch(IOException e1) {}
             }
         }
         catch (Throwable e) {
-            try{
                 this.sendResponse("421 4.3.0 Mail system failure, closing transmission channel");
-            }
-            catch (IOException ioException)
-            {}
 
             if (e instanceof RuntimeException)
                 throw (RuntimeException) e;
-            else if (e instanceof Error)
-                throw (Error) e;
             else
-                throw new RuntimeException("Unexpected exception", e);
+                throw (Error) e;
         }
         finally {
             this.closeConnection();
@@ -100,12 +89,12 @@ public class Session implements Runnable{
 
         while(!this.quitting) {
              try {
-                    String inputLine = null;
+                    String inputLine;
                  try {
                      inputLine  = this.reader.readLine();
                      System.out.println("Client: "+inputLine);
                  }catch (SocketException e) {
-                     System.out.println(e);
+                     e.printStackTrace();
                      return;
                  }
 
@@ -133,7 +122,7 @@ public class Session implements Runnable{
         }
     }
 
-    public void sendResponse(String response) throws IOException
+    public void sendResponse(String response)
     {
         System.out.println(response);
         this.writer.print(response);

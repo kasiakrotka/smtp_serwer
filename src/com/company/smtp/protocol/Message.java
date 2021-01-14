@@ -5,17 +5,22 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Message {
-    private LinkedList<String> headers, body, forwardPath, reversePath;
-    private String recipient;
+    private LinkedList<String> headers, body, forwardPath, reversePath, recipients;
     private String sender;
 
     public Message() {
+        recipients = new LinkedList<>();
+        headers = new LinkedList<>();
+        body = new LinkedList<>();
+        forwardPath = new LinkedList<>();
+        reversePath = new LinkedList<>();
     }
 
     public Message(LinkedList<String> headers, LinkedList<String> body, String recipient, String sender) {
+        recipients = new LinkedList<>();
         this.headers = headers;
         this.body = body;
-        this.recipient = recipient;
+        this.recipients.push(recipient);
         this.sender = sender;
     }
 
@@ -98,12 +103,16 @@ public class Message {
         this.reversePath = reversePath;
     }
 
-    public String getRecipient() {
-        return recipient;
+    public List<String> getRecipients() {
+        return recipients;
     }
 
-    public void setRecipient(String recipient) {
-        this.recipient = recipient;
+    public void setRecipient(LinkedList<String> recipients) {
+        this.recipients = recipients;
+    }
+
+    public void addRecipient(String recipient){
+        this.recipients.push(recipient);
     }
 
     public String getSender() {
@@ -115,5 +124,11 @@ public class Message {
     }
 
     public void resetMessage() {
+        this.headers = new LinkedList<>();
+        this.body = new LinkedList<>();
+        this.forwardPath = new LinkedList<>();
+        this.reversePath = new LinkedList<>();
+        this.recipients =  new LinkedList<>();
+        this.sender = null;
     }
 }

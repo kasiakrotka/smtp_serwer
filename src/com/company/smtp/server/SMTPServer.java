@@ -15,7 +15,7 @@ public class SMTPServer {
 
     private int port = 8081;
     private InetAddress inetAddress = null;
-    private String hostName = "localhost";
+    private String hostName;
     private int timeout = 60000; //60s
     private int maxConnections = 50;
     private boolean started= false;

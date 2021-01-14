@@ -1,7 +1,5 @@
 package com.company.smtp.server;
 
-import net.jcip.annotations.GuardedBy;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,13 +12,13 @@ import java.util.concurrent.TimeUnit;
 
 class ServerThread extends Thread{
 
-    private SMTPServer parentServer;
-    private ServerSocket serverSocket;
+    private final SMTPServer parentServer;
+    private final ServerSocket serverSocket;
 
-    private int availableConnections = 100;
+    private final int availableConnections;
     private volatile boolean shutDown = false;
-    //semaphore that block thread if number of them reached maximum.
-    private Semaphore connectionSemaphore;
+    //Semafory blokujące dostęp do wątku jeśli liczba połączeń osiągnie maksimum
+    private final Semaphore connectionSemaphore;
     private final Set<Session> sessionSet;
 
 
@@ -29,7 +27,7 @@ class ServerThread extends Thread{
         this.serverSocket = serverSocket;
         this.availableConnections = this.parentServer.getMaxConnections() + 10;
         this.connectionSemaphore = new Semaphore(availableConnections);
-        this.sessionSet = new HashSet<Session>();
+        this.sessionSet = new HashSet<>();
     }
 
     public void run() {
@@ -51,7 +49,8 @@ class ServerThread extends Thread{
                 continue;
             }
 
-            Socket socket = null;
+            Socket socket;
+
             try {
                 socket = this.serverSocket.accept();
             } catch (IOException e) {
@@ -59,11 +58,13 @@ class ServerThread extends Thread{
                 connectionSemaphore.release();
                 if(!this.shutDown) {
                     try{ Thread.sleep(1000);}
-                    catch(InterruptedException e1){}
+                    catch(InterruptedException e1){
+                        e1.printStackTrace();
+                    }
                 }
                 continue;
             }
-            Session session = null;
+            Session session;
             try {
                 session = new Session(parentServer, this, socket);
             } catch (IOException e) {
@@ -114,7 +115,7 @@ class ServerThread extends Thread{
         //shutting down session
         ArrayList<Session> sessionToBeClosed;
         synchronized (this) {
-            sessionToBeClosed = new ArrayList<Session>(sessionSet);
+            sessionToBeClosed = new ArrayList<>(sessionSet);
         }
         for(Session sessionThread: sessionToBeClosed){
             sessionThread.quit();
