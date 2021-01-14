@@ -65,53 +65,55 @@ public class MessageHandler {
     }
 
     public void sendMessage(Message message){
-        String address = message.getRecipient();
-        int at = address.indexOf('@');
-        if (at == -1)
-            sendErrorMessage(message);
-        String domain = address.substring(at + 1);
-        if (domain.equals("ghost.com")) {
-            MDA mda = new MDA();
-            int matching = mda.checkIfExists(address);
-            if (matching > 0)
-                sendMessageByMDA(message);
-            else
-                sendErrorMessage(message);
-        }
-        else {
-            relayMessage(message, domain);
+        LinkedList<String> addresses = message.getRecipients();
+        for(int i = 0; i < addresses.size(); i++){
+            int at = addresses.get(i).indexOf('@');
+            if (at == -1)
+                sendErrorMessage(message, i);
+            String domain = addresses.get(i).substring(at + 1);
+            if (domain.equals("ghost.com")) {
+                MDA mda = new MDA();
+                int matching = mda.checkIfExists(addresses.get(i));
+                if (matching > 0)
+                    sendMessageByMDA(message, i);
+                else
+                    sendErrorMessage(message, i);
+            }
+            else {
+                relayMessage(message, domain, i);
+            }
         }
     }
 
-    private void sendMessageByMDA(Message message){
+    private void sendMessageByMDA(Message message, int index){
         MDA MDA = new MDA();
-        MDA.InsertMessage(message);
+        MDA.InsertMessage(message, index);
     }
 
-    private void sendErrorMessage(Message message){
+    private void sendErrorMessage(Message message, int i){
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
         String date = sdf.format(new Date());
         Message errorMessage = new Message();
-        errorMessage.setRecipient(message.getSender());
+        errorMessage.addRecipient(message.getSender());
         errorMessage.setSender("");
         errorMessage.getHeaders().add("Subject: Wiadomość nie została dostarczona\r\n");
         errorMessage.getHeaders().add("Date: "+date+"\r\n");
-        errorMessage.getHeaders().add("To: "+message.getRecipient()+"\r\n");
+        errorMessage.getHeaders().add("To: "+message.getSender()+"\r\n");
         errorMessage.getHeaders().add("From: \r\n");
         errorMessage.getHeaders().add("Content-Type: text/html; charset=UTF-8\r\n");
-        errorMessage.getBody().add("Wiadomość wysłana na adres: "+message.getRecipient()+" nie została dostarczona\r\n");
+        errorMessage.getBody().add("Wiadomość wysłana na adres: "+message.getRecipients().get(i)+" nie została dostarczona\r\n");
         errorMessage.getBody().add("Adres nie istnieje lub wystrąpił wewnętrzny błąd serwera poczty\r\n");
 
         int at = message.getSender().indexOf('@');
         String domain = message.getSender().substring(at + 1);
         if (domain.equals("ghost.com"))
-            sendMessageByMDA(errorMessage);
+            sendMessageByMDA(errorMessage, 0);
         else
-            relayMessage(errorMessage, domain);
+            relayMessage(errorMessage, domain, i);
     }
 
-    private void relayMessage(Message message, String domain){
-        SMTPClient smtpClient = new SMTPClient(message, domain);
+    private void relayMessage(Message message, String domain, int i){
+        SMTPClient smtpClient = new SMTPClient(message, domain, i);
         smtpClient.run();
     }
 }

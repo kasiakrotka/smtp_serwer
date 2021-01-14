@@ -23,25 +23,26 @@ public class SMTPClient implements Runnable {
     private boolean connected = false;
     private final int connectionTimeout = 1000 * 120;
     private final int resposnseTimeout = 1000 * 60;
+    private final int address_index;
 
-    public SMTPClient() {
+    public SMTPClient(Message message, String domain, int i) {
         try {
             this.hostName = InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
             this.hostName = "localhost";
         }
+        this.address_index = i;
         this.message = null;
         this.domain = null;
     }
 
-    public SMTPClient(Message message, String domain) {
+    public SMTPClient(){
+        this.address_index = 0;
         try {
             this.hostName = InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
             this.hostName = "localhost";
         }
-        this.message = message;
-        this.domain = domain;
     }
 
     private class Response {
@@ -163,7 +164,7 @@ public class SMTPClient implements Runnable {
                     sendLine("QUIT");
                     return false;
                 }
-                sendLine("RCPT TO: <" + message.getRecipient() + ">");
+                sendLine("RCPT TO: <" + message.getRecipients().get(this.address_index) + ">");
                 resp = read();
                 if (resp.code != 250) {
                     sendLine("QUIT");

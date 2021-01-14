@@ -34,11 +34,11 @@ public class Main {
         LinkedList<String> headers = new LinkedList<>();
         headers.add("Subject: Wiadomość nie została dostarczona\r\n");
         headers.add("Date: "+date+"\r\n");
-        headers.add("To: "+message.getRecipient()+"\r\n");
+        headers.add("To: kasia@ghost.com\r\n");
         headers.add("From: \r\n");
         message.setHeaders(headers);
         message.setSender("jakis@gmail.com");
-        message.setRecipient("kasia@ghost.com");
+        message.addRecipient("kasia@ghost.com");
         message.setBody(body);
         //mda.InsertMessage(message);
 /*

@@ -103,7 +103,7 @@ public class Message {
         this.reversePath = reversePath;
     }
 
-    public List<String> getRecipients() {
+    public LinkedList<String> getRecipients() {
         return recipients;
     }
 

@@ -51,13 +51,13 @@ public class MDA {
         return count;
     }
 
-    public void InsertMessage(Message message) {
+    public void InsertMessage(Message message, int index) {
         long mailbox_id = 0;
         try {
             message.getDate();
             Connection conn = connect();
             PreparedStatement preparedStatement = conn.prepareStatement(FIND_MAILBOX_ID);
-            preparedStatement.setString(1, message.getRecipient());
+            preparedStatement.setString(1, message.getRecipients().get(index));
             preparedStatement.setMaxRows(1);
             System.out.println(preparedStatement);
             ResultSet resultSet = preparedStatement.executeQuery();
